@@ -3,6 +3,7 @@ const app =  express();
 const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
 
+const expenseRoutes = require('./routes/expenses');
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
     .then((e) => console.log('connected to db'))
@@ -11,7 +12,6 @@ mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
 
 //log mongoose queries    
 process.env.NODE_ENV === 'development' && mongoose.set('debug', true);
-
 app.use(bodyparser.json());
 
 app.use((req, res, next) => {
@@ -38,6 +38,8 @@ app.get("/",function(req,res){
 		messsage:  `server is running at PORT: ${process.env.PORT}`
 	})
 });
+
+app.use('/expenses', expenseRoutes);
 
 //404 error response
 app.get('*', (req, res)=>{
