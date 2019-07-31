@@ -4,6 +4,8 @@ const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
 
 const expenseRoutes = require('./routes/expenses');
+const categoriesRoutes = require('./routes/categories');
+const profileRoutes = require('./routes/profile');
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
     .then((e) => console.log('connected to db'))
@@ -12,7 +14,8 @@ mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
 
 //log mongoose queries    
 process.env.NODE_ENV === 'development' && mongoose.set('debug', true);
-app.use(bodyparser.json());
+app.use(bodyparser.json({limit: '5mb', extended: false}));    
+app.use(bodyparser.urlencoded({limit: '5mb', extended: false})) 
 
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', process.env.CLIENT_API_BASE_URL);
@@ -40,9 +43,11 @@ app.get("/",function(req,res){
 });
 
 app.use('/expenses', expenseRoutes);
+app.use('/categories', categoriesRoutes);
+app.use('/profile', profileRoutes);
 
 //404 error response
-app.get('*', (req, res)=>{
+app.all('*', (req, res)=>{
 	res.status(404).json({
 		message: `Error 404. requested path ${req.method}, ${req.url} not found.`,
 		success: false 
